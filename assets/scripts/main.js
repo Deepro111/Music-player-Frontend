@@ -1,81 +1,66 @@
-// console.log("HEY We are here")
+// console.log("HEY We are here");
+
 // let currentAudio = new Audio();
 
-// //function to convert seconds into minutes
+// // Function to convert seconds into MM:SS format
 // function convertSecondsToMinutes(seconds) {
-//     // Round down the seconds to ensure no fractions
 //     seconds = Math.floor(seconds);
-
 //     const minutes = Math.floor(seconds / 60);
 //     const remainingSeconds = seconds % 60;
-
-//     // Ensure two digits for both minutes and seconds
-//     const formattedMinutes = minutes.toString().padStart(2, '0');
-//     const formattedSeconds = remainingSeconds.toString().padStart(2, '0');
-
-//     return `${formattedMinutes}:${formattedSeconds}`;
+//     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
 // }
 
 // // URL of the API endpoint
 // const apiUrl = 'https://mysongapit.onrender.com/api/songs';
-// );
 
-
-// // Function to fetch data
+// // Function to fetch song data
 // async function fetchData() {
 //     try {
-//         // Send GET request
 //         const response = await fetch(apiUrl);
-//         console.log(response);
-        
-//         // Check if the request was successful
 //         if (!response.ok) {
 //             throw new Error(`HTTP error! Status: ${response.status}`);
 //         }
 
-//         // Parse the JSON data
 //         const songData = await response.json();
+//         console.log(songData);
 //         playSong(songData);
 
-//         // Process and log the data
-//         console.log(songData);  // Corrected this line
 //     } catch (error) {
 //         console.error('Error fetching data:', error);
 //     }
 // }
 
-// // Call the function to fetch data
+// // Call fetchData on load
 // fetchData();
 
-
-// const playMusic = (track, title, artist, pause=false) => {
-
-//     currentAudio.src = track;
-//     if(!pause){
+// // Function to play a specific music track
+// function playMusic(trackUrl, title, artist, pause = false) {
+//     currentAudio.src = trackUrl;
+//     if (!pause) {
 //         currentAudio.play();
 //         play.className = "bi bi-pause-circle-fill";
 //     }
-    
-//     document.querySelector(".songName").innerHTML = title+`<p>${artist}</p>`
-//     document.querySelector(".songTime").innerHTML = "00:00 / 00:00"
 
-// };
+//     document.querySelector(".songName").innerHTML = `${title}<p>${artist}</p>`;
+//     document.querySelector(".songTime").innerHTML = "00:00 / 00:00";
+// }
 
+// // Function to build and control the song playlist
 // function playSong(songData) {
 //     let playList = document.querySelector(".playlist");
-//     playList.innerHTML = '';  // Clear existing content
-    
+//     playList.innerHTML = ''; // Clear previous list
+
+//     // Play the first song by default but paused
 //     playMusic(songData[0].url, songData[0].song, songData[0].artist, true);
-//     // Loop through the song data and create playlist items
+
 //     songData.forEach(song => {
 //         let listItem = document.createElement('li');
 //         listItem.classList.add('library-card');
 
-//         // Create inner HTML for the list item
 //         listItem.innerHTML = `
 //             <div class="library-card-wrap">
 //                 <div class="song-icon">
-//                     <img src=${song.image} class="songImg">
+//                     <img src="${song.image}" class="songImg">
 //                 </div>
 //                 <div class="song-details">
 //                     <p>${song.song}</p>
@@ -87,43 +72,36 @@
 //             </div>
 //         `;
 
-//         // Append the list item to the playlist
-//         playList.appendChild(listItem);
-
-//         // Add click event listener to play the song
+//         // Play selected song on click
 //         listItem.addEventListener('click', () => {
-//             playMusic(song.songlink, song.title, song.artist);  // Play selected song and stop previous one
+//             playMusic(song.url, song.song, song.artist);
 //         });
 
-//         //  const play = document.getElementById("play");
-//         // console.log(play);
-
-
+//         playList.appendChild(listItem);
 //     });
 
-//     // const play = document.getElementById("play");
+//     const play = document.getElementById("play");
 
-//     play.addEventListener('click', () => {
-//         console.log(currentAudio);
-//         if (currentAudio.paused) {
-//             currentAudio.play()
-//             play.className = "bi bi-pause-circle-fill";
-//         }
-//         else {
-//             currentAudio.pause();
-//             play.className = "bi bi-play-circle-fill"
-//         }
+//     if (play) {
+//         play.addEventListener('click', () => {
+//             if (currentAudio.paused) {
+//                 currentAudio.play();
+//                 play.className = "bi bi-pause-circle-fill";
+//             } else {
+//                 currentAudio.pause();
+//                 play.className = "bi bi-play-circle-fill";
+//             }
+//         });
+//     }
+
+//     currentAudio.addEventListener('timeupdate', () => {
+//         const current = convertSecondsToMinutes(currentAudio.currentTime);
+//         const total = convertSecondsToMinutes(currentAudio.duration || 0);
+//         document.querySelector(".songTime").innerHTML = `${current} / ${total}`;
+
+//         const progress = (currentAudio.currentTime / currentAudio.duration) * 100;
+//         document.querySelector(".circle").style.left = `${progress || 0}%`;
 //     });
-
-//     currentAudio.addEventListener('timeupdate', ()=>{
-//         console.log(currentAudio.currentTime);
-//         document.querySelector(".songTime").innerHTML = `${convertSecondsToMinutes(currentAudio.currentTime)} / ${convertSecondsToMinutes(currentAudio.duration)}`
-        
-//         document.querySelector(".circle").style.left = (currentAudio.currentTime / currentAudio.duration)*100+"%"
-        
-//     })
-
-
 // }
 
 
@@ -132,36 +110,17 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-console.log("HEY We are here");
+// === MAIN JS: ENHANCED MUSIC PLAYER ===
+console.log("Enhanced Music Player Loaded");
 
 let currentAudio = new Audio();
+let currentIndex = 0;
+let songsList = [];
+let playListItems = [];
+let isShuffle = false;
+let isRepeat = false;
 
-// Function to convert seconds into MM:SS format
+// Converts seconds to MM:SS
 function convertSecondsToMinutes(seconds) {
     seconds = Math.floor(seconds);
     const minutes = Math.floor(seconds / 60);
@@ -169,98 +128,168 @@ function convertSecondsToMinutes(seconds) {
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
 }
 
-// URL of the API endpoint
 const apiUrl = 'https://mysongapit.onrender.com/api/songs';
 
-// Function to fetch song data
 async function fetchData() {
     try {
         const response = await fetch(apiUrl);
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-
+        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
         const songData = await response.json();
-        console.log(songData);
         playSong(songData);
-
     } catch (error) {
         console.error('Error fetching data:', error);
     }
 }
-
-// Call fetchData on load
 fetchData();
 
-// Function to play a specific music track
-function playMusic(trackUrl, title, artist, pause = false) {
+function highlightPlayingSong(index) {
+    playListItems.forEach((item, idx) => {
+        item.classList.toggle('active-song', idx === index);
+    });
+}
+
+function playMusic(trackUrl, title, artist, image, pause = false) {
     currentAudio.src = trackUrl;
     if (!pause) {
         currentAudio.play();
-        play.className = "bi bi-pause-circle-fill";
+        document.getElementById("play").className = "bi bi-pause-circle-fill";
     }
-
-    document.querySelector(".songName").innerHTML = `${title}<p>${artist}</p>`;
+    document.querySelector(".songName").innerHTML = `
+        <img src="${image}" class="songImg" />
+        <div><strong>${title}</strong><br/><small>${artist}</small></div>
+    `;
     document.querySelector(".songTime").innerHTML = "00:00 / 00:00";
+    highlightPlayingSong(currentIndex);
 }
 
-// Function to build and control the song playlist
 function playSong(songData) {
-    let playList = document.querySelector(".playlist");
-    playList.innerHTML = ''; // Clear previous list
+    songsList = songData;
+    const playList = document.querySelector(".playlist");
+    playList.innerHTML = '';
+    playListItems = [];
+    playMusic(songData[0].url, songData[0].song, songData[0].artist, songData[0].image, true);
 
-    // Play the first song by default but paused
-    playMusic(songData[0].url, songData[0].song, songData[0].artist, true);
-
-    songData.forEach(song => {
-        let listItem = document.createElement('li');
+    songData.forEach((song, index) => {
+        const listItem = document.createElement('li');
         listItem.classList.add('library-card');
-
         listItem.innerHTML = `
             <div class="library-card-wrap">
-                <div class="song-icon">
-                    <img src="${song.image}" class="songImg">
-                </div>
-                <div class="song-details">
-                    <p>${song.song}</p>
-                    <p>${song.artist}</p>
-                </div>
+                <img src="${song.image}" class="songImg">
+                <div><p>${song.song}</p><p>${song.artist}</p></div>
             </div>
-            <div class="play-song">
-                <i class="bi bi-play-circle"></i>
-            </div>
+            <div><i class="bi bi-play-circle"></i></div>
         `;
-
-        // Play selected song on click
         listItem.addEventListener('click', () => {
-            playMusic(song.url, song.song, song.artist);
+            currentIndex = index;
+            playMusic(song.url, song.song, song.artist, song.image);
         });
-
         playList.appendChild(listItem);
+        playListItems.push(listItem);
     });
 
-    const play = document.getElementById("play");
-
-    if (play) {
-        play.addEventListener('click', () => {
-            if (currentAudio.paused) {
-                currentAudio.play();
-                play.className = "bi bi-pause-circle-fill";
-            } else {
-                currentAudio.pause();
-                play.className = "bi bi-play-circle-fill";
-            }
-        });
-    }
+    document.getElementById("play").addEventListener('click', () => {
+        if (currentAudio.paused) {
+            currentAudio.play();
+            play.className = "bi bi-pause-circle-fill";
+        } else {
+            currentAudio.pause();
+            play.className = "bi bi-play-circle-fill";
+        }
+    });
 
     currentAudio.addEventListener('timeupdate', () => {
         const current = convertSecondsToMinutes(currentAudio.currentTime);
         const total = convertSecondsToMinutes(currentAudio.duration || 0);
         document.querySelector(".songTime").innerHTML = `${current} / ${total}`;
-
         const progress = (currentAudio.currentTime / currentAudio.duration) * 100;
         document.querySelector(".circle").style.left = `${progress || 0}%`;
     });
-}
 
+    currentAudio.addEventListener('ended', () => {
+        if (isRepeat) {
+            playMusic(songsList[currentIndex].url, songsList[currentIndex].song, songsList[currentIndex].artist, songsList[currentIndex].image);
+        } else {
+            document.getElementById("next").click();
+        }
+    });
+
+    document.getElementById("previous").addEventListener('click', () => {
+        currentIndex = (currentIndex - 1 + songsList.length) % songsList.length;
+        const song = songsList[currentIndex];
+        playMusic(song.url, song.song, song.artist, song.image);
+    });
+
+    document.getElementById("next").addEventListener('click', () => {
+        if (isShuffle) {
+            currentIndex = Math.floor(Math.random() * songsList.length);
+        } else {
+            currentIndex = (currentIndex + 1) % songsList.length;
+        }
+        const song = songsList[currentIndex];
+        playMusic(song.url, song.song, song.artist, song.image);
+    });
+
+    // Search filtering
+    document.querySelector(".search_input").addEventListener("input", function () {
+        const query = this.value.toLowerCase();
+        playListItems.forEach((item, idx) => {
+            const match = songsList[idx].song.toLowerCase().includes(query) || songsList[idx].artist.toLowerCase().includes(query);
+            item.style.display = match ? "" : "none";
+        });
+    });
+
+    // Seek bar interaction
+    document.querySelector(".seekbar").addEventListener("click", function (e) {
+        const rect = this.getBoundingClientRect();
+        const percent = (e.clientX - rect.left) / rect.width;
+        currentAudio.currentTime = percent * currentAudio.duration;
+    });
+
+    // Volume control
+    const volumeSlider = document.createElement("input");
+    volumeSlider.type = "range";
+    volumeSlider.min = 0;
+    volumeSlider.max = 1;
+    volumeSlider.step = 0.01;
+    volumeSlider.value = 1;
+    volumeSlider.style.marginLeft = "10px";
+    volumeSlider.addEventListener("input", () => currentAudio.volume = volumeSlider.value);
+    document.querySelector(".songBtns").appendChild(volumeSlider);
+
+    // Shuffle/Repeat Toggle
+    const controls = document.createElement("div");
+    controls.innerHTML = `
+        <i id="shuffleBtn" class="bi bi-shuffle"></i>
+        <i id="repeatBtn" class="bi bi-repeat"></i>
+    `;
+    controls.style.display = "flex";
+    controls.style.gap = "10px";
+    document.querySelector(".songBtns").appendChild(controls);
+
+    document.getElementById("shuffleBtn").addEventListener("click", () => {
+        isShuffle = !isShuffle;
+        document.getElementById("shuffleBtn").style.color = isShuffle ? "#1ABC9C" : "#000";
+    });
+
+    document.getElementById("repeatBtn").addEventListener("click", () => {
+        isRepeat = !isRepeat;
+        document.getElementById("repeatBtn").style.color = isRepeat ? "#1ABC9C" : "#000";
+    });
+
+    // Keyboard Shortcuts
+    document.addEventListener("keydown", (e) => {
+        switch (e.key) {
+            case " ":
+                e.preventDefault();
+                play.click();
+                break;
+            case "ArrowRight":
+                document.getElementById("next").click();
+                break;
+            case "ArrowLeft":
+                document.getElementById("previous").click();
+                break;
+        }
+    });
+}
 

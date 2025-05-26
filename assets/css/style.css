@@ -353,3 +353,8 @@ img {
     max-width: 200px;
   }
 }
+
+.active-song {
+    background-color: #d1f0d1; /* light green background */
+    border-left: 4px solid #4CAF50; /* green accent */
+}
